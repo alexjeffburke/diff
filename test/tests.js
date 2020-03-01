@@ -481,11 +481,15 @@
       };
 
       describe('differences in nested arrays are detected', function () {
-        var diff = deep.diff(lhs, rhs);
+        var diff;
 
-        // there should be differences
-        expect(diff).to.be.ok();
-        expect(diff.length).to.be(6);
+        beforeEach(function () {
+          diff = deep.diff(lhs, rhs);
+
+          // there should be differences
+          expect(diff).to.be.ok();
+          expect(diff.length).to.be(2);
+        });
 
         it('differences can be applied', function () {
           var applied = deep.applyDiff(lhs, rhs);
@@ -645,6 +649,46 @@
 
         expect(diff[0].kind).to.be('N');
         expect(diff[0].rhs).to.be(undefined);
+      });
+    });
+
+    describe('regression tests for array edits', function () {
+      it('should return a DiffArray with DiffEdit item', function () {
+        var diff = deep.diff({ foo: [1, 2, 3] }, { foo: [1, 2, 4] });
+
+        expect(diff).to.be.an(Array);
+        expect(diff.length).to.be(1);
+        expect(diff[0].kind).to.be('A');
+      });
+
+      it('should diff correctly with nested object', function () {
+        var diff = deep.diff(
+          {
+            foo: [{ bar: [1, 2, 3] }]
+          },
+          {
+            foo: [{ bar: [1, 2, 4] }]
+          }
+        );
+
+        expect(diff).to.be.an(Array);
+        expect(diff.length).to.be(1);
+        expect(diff[0].kind).to.be('A');
+      });
+
+      it('should diff correctly with a multi-level nested object', function () {
+        var diff = deep.diff(
+          {
+            foo: [{ bar: { baz: [1, 2, 3] } }]
+          },
+          {
+            foo: [{ bar: { baz: [1, 2, 4] } }]
+          }
+        );
+
+        expect(diff).to.be.an(Array);
+        expect(diff.length).to.be(1);
+        expect(diff[0].kind).to.be('A');
       });
     });
 

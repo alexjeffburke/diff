@@ -243,7 +243,15 @@
             changes.push(new DiffArray(currentPath, j, new DiffDeleted(undefined, lhs[j--])));
           }
           for (; i >= 0; --i) {
-            deepDiff(lhs[i], rhs[i], changes, prefilter, currentPath, i, stack, orderIndependent);
+            var arrayChanges = [];
+            deepDiff(lhs[i], rhs[i], arrayChanges, prefilter, currentPath.slice(1), i, stack, orderIndependent);
+            if (arrayChanges.length > 0) {
+              var arrayEdit = arrayChanges[0];
+              // remove leading part of the path (i.e. the array index)
+              arrayEdit.path.shift();
+              // include it as an array change
+              changes.push(new DiffArray(currentPath, i, arrayEdit));
+            }
           }
         } else {
           var akeys = Object.keys(lhs).concat(Object.getOwnPropertySymbols(lhs));
@@ -320,6 +328,9 @@
         i, u = change.path.length - 1;
       for (i = 0; i < u; i++) {
         it = it[change.path[i]];
+      }
+      if (!it) {
+        it = arr[index] = {};
       }
       switch (change.kind) {
         case 'A':
