@@ -245,8 +245,8 @@
           for (; i >= 0; --i) {
             var arrayChanges = [];
             deepDiff(lhs[i], rhs[i], arrayChanges, prefilter, currentPath.slice(1), i, stack, orderIndependent);
-            if (arrayChanges.length > 0) {
-              var arrayEdit = arrayChanges[0];
+            while (arrayChanges.length > 0) {
+              var arrayEdit = arrayChanges.shift();
               // remove leading part of the path (i.e. the array index)
               arrayEdit.path.shift();
               // include it as an array change
